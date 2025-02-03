@@ -4,6 +4,7 @@ const { program } = require('commander');
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
+const SolidityParser = require('./parser');
 
 program
   .name('smart-contract-scanner')
@@ -21,7 +22,23 @@ program
     
     const content = fs.readFileSync(file, 'utf8');
     console.log(chalk.green('✓ File loaded successfully'));
-    console.log(chalk.yellow('⚠️  Scanner implementation in progress...'));
+    
+    const parser = new SolidityParser(content);
+    const parsed = parser.extractCode();
+    
+    console.log(chalk.blue('\n📊 Code Analysis:'));
+    console.log(chalk.gray(`  Lines of code: ${parsed.totalLines}`));
+    console.log(chalk.gray(`  Contracts found: ${parsed.contracts.length}`));
+    console.log(chalk.gray(`  Functions found: ${parsed.functions.length}`));
+    
+    if (parsed.contracts.length > 0) {
+      console.log(chalk.blue('\n📝 Contracts:'));
+      parsed.contracts.forEach(contract => {
+        console.log(chalk.cyan(`  - ${contract.name} (line ${contract.line})`));
+      });
+    }
+    
+    console.log(chalk.yellow('\n⚠️  Vulnerability scanning in progress...'));
   });
 
 program.parse();
