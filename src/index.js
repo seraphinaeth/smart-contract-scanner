@@ -5,6 +5,7 @@ const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
 const SolidityParser = require('./parser');
+const VulnerabilityScanner = require('./scanner');
 
 program
   .name('smart-contract-scanner')
@@ -38,7 +39,26 @@ program
       });
     }
     
-    console.log(chalk.yellow('\n⚠️  Vulnerability scanning in progress...'));
+    const scanner = new VulnerabilityScanner(content, parsed);
+    const vulnerabilities = scanner.scan();
+    
+    console.log(chalk.blue('\n🔍 Security Analysis Results:'));
+    
+    if (vulnerabilities.length === 0) {
+      console.log(chalk.green('✅ No vulnerabilities detected'));
+    } else {
+      console.log(chalk.red(`⚠️  Found ${vulnerabilities.length} potential issues:\n`));
+      
+      vulnerabilities.forEach((vuln, index) => {
+        const severity = vuln.severity === 'HIGH' ? chalk.red(vuln.severity) : 
+                        vuln.severity === 'MEDIUM' ? chalk.yellow(vuln.severity) : 
+                        chalk.blue(vuln.severity);
+        
+        console.log(`${index + 1}. ${chalk.cyan(vuln.type)} [${severity}]`);
+        console.log(`   Line ${vuln.line}: ${vuln.description}`);
+        console.log(`   Code: ${chalk.gray(vuln.code)}\n`);
+      });
+    }
   });
 
 program.parse();
