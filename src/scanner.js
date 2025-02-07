@@ -64,10 +64,57 @@ class VulnerabilityScanner {
     });
   }
 
+  checkGasOptimization() {
+    this.lines.forEach((line, index) => {
+      if (line.includes('for (') && line.includes('.length')) {
+        this.vulnerabilities.push({
+          type: 'Gas Optimization',
+          line: index + 1,
+          severity: 'LOW',
+          description: 'Cache array length to save gas in loops',
+          code: line.trim()
+        });
+      }
+      
+      if (line.includes('storage') && line.includes('memory')) {
+        this.vulnerabilities.push({
+          type: 'Gas Optimization',
+          line: index + 1,
+          severity: 'LOW',
+          description: 'Consider storage vs memory usage for gas efficiency',
+          code: line.trim()
+        });
+      }
+    });
+  }
+
+  checkTimestampDependence() {
+    const timestampPatterns = [
+      /block\.timestamp/,
+      /now/
+    ];
+    
+    this.lines.forEach((line, index) => {
+      timestampPatterns.forEach(pattern => {
+        if (pattern.test(line)) {
+          this.vulnerabilities.push({
+            type: 'Timestamp Dependence',
+            line: index + 1,
+            severity: 'MEDIUM',
+            description: 'Avoid using block.timestamp for critical logic',
+            code: line.trim()
+          });
+        }
+      });
+    });
+  }
+
   scan() {
     this.checkReentrancy();
     this.checkAccessControl();
     this.checkIntegerOverflow();
+    this.checkGasOptimization();
+    this.checkTimestampDependence();
     
     return this.vulnerabilities;
   }
