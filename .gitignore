@@ -5,3 +5,6 @@ node_modules/
 CLAUDE.md
 dist/
 coverage/
+*-report.json
+*-report.md
+reports/

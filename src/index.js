@@ -6,13 +6,16 @@ const fs = require('fs');
 const path = require('path');
 const SolidityParser = require('./parser');
 const VulnerabilityScanner = require('./scanner');
+const SecurityReporter = require('./reporter');
 
 program
   .name('smart-contract-scanner')
   .description('Security scanner for Ethereum smart contracts')
   .version('0.1.0')
   .argument('<file>', 'Solidity contract file to scan')
-  .action((file) => {
+  .option('-o, --output <type>', 'output format (json|md)', 'console')
+  .option('-r, --report <path>', 'save report to file')
+  .action((file, options) => {
     console.log(chalk.blue('🔍 Smart Contract Scanner v0.1.0'));
     console.log(chalk.gray('Scanning:', file));
     
@@ -58,6 +61,23 @@ program
         console.log(`   Line ${vuln.line}: ${vuln.description}`);
         console.log(`   Code: ${chalk.gray(vuln.code)}\n`);
       });
+    }
+    
+    if (options.report || options.output !== 'console') {
+      const reporter = new SecurityReporter(vulnerabilities, parsed, path.basename(file));
+      
+      if (options.output === 'json') {
+        const reportPath = options.report || `${path.basename(file, '.sol')}-report.json`;
+        const savedPath = reporter.saveReport(reportPath);
+        console.log(chalk.green(`\n✅ JSON report saved to: ${savedPath}`));
+      }
+      
+      if (options.output === 'md') {
+        const mdReport = reporter.generateMarkdownReport();
+        const reportPath = options.report || `${path.basename(file, '.sol')}-report.md`;
+        fs.writeFileSync(reportPath, mdReport);
+        console.log(chalk.green(`\n✅ Markdown report saved to: ${reportPath}`));
+      }
     }
   });
 
