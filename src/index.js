@@ -11,12 +11,12 @@ const SecurityReporter = require('./reporter');
 program
   .name('smart-contract-scanner')
   .description('Security scanner for Ethereum smart contracts')
-  .version('0.1.0')
+  .version('0.2.0')
   .argument('<file>', 'Solidity contract file to scan')
   .option('-o, --output <type>', 'output format (json|md)', 'console')
   .option('-r, --report <path>', 'save report to file')
   .action((file, options) => {
-    console.log(chalk.blue('🔍 Smart Contract Scanner v0.1.0'));
+    console.log(chalk.blue('🔍 Smart Contract Scanner v0.2.0'));
     console.log(chalk.gray('Scanning:', file));
     
     if (!fs.existsSync(file)) {

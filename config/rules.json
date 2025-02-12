@@ -1,0 +1,35 @@
+{
+  "rules": {
+    "reentrancy": {
+      "enabled": true,
+      "severity": "HIGH",
+      "patterns": ["\\.call\\(", "\\.send\\(", "\\.transfer\\("],
+      "description": "External call detected - check for reentrancy protection"
+    },
+    "integerOverflow": {
+      "enabled": true,
+      "severity": "HIGH",
+      "description": "Arithmetic operation without overflow protection"
+    },
+    "accessControl": {
+      "enabled": true,
+      "severity": "MEDIUM",
+      "description": "Public function without access control modifier"
+    },
+    "gasOptimization": {
+      "enabled": false,
+      "severity": "LOW",
+      "description": "Gas optimization suggestions"
+    },
+    "timestampDependence": {
+      "enabled": true,
+      "severity": "MEDIUM",
+      "patterns": ["block\\.timestamp", "\\bnow\\b"],
+      "description": "Avoid using block.timestamp for critical logic"
+    }
+  },
+  "ignorePatterns": [
+    "// IGNORE-SCANNER",
+    "/* IGNORE-SCANNER */"
+  ]
+}
